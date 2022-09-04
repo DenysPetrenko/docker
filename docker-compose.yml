@@ -1,0 +1,44 @@
+version: '3.1'
+
+services:
+  nix_2_php:
+    build: ./php
+    container_name: nix_2_php
+    volumes:
+      - ../server:/var/www/html
+    ports:
+      - '8184:80'
+    environment:
+      WEB_DOCUMENT_ROOT: /var/www/html/public
+      WEB_DOCUMENT_INDEX: index.php
+      PHP_MEMORY_LIMIT: 2048M
+      PHP_UPLOAD_MAX_FILESIZE: 512M
+      PHP_POSTMAX_SIZE: 512M
+      PHP_DISPLAY_ERRORS: 1
+
+    depends_on:
+      - nix_2_mysql
+
+  nix_2_mysql:
+    build: ./mysql
+    container_name: nix_2_mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: myapp
+      MYSQL_DATABASE: nix2
+      MYSQL_USER: myapp
+      MYSQL_PASSWORD: myapp
+    ports:
+      - '8004:3306'
+    volumes:
+      - ../nix_2-db:/var/lib/mysql
+  phpmyadmin:
+    depends_on:
+      - nix_2_mysql
+    image: phpmyadmin/phpmyadmin:latest
+    ports:
+      - '8009:80'
+    environment:
+     PMA_HOST: nix_2_mysql
+
+volumes:
+  nix_2:
